@@ -35,7 +35,7 @@ MixerSend {
 			levelControl = GenericGlobalControl("send level", nil, level, \amp);
 		});
 
-		levelSynth = levelControl.play(synthdef, args, inMixer.fadergroup);
+		levelSynth = levelControl.automate(synthdef, args, inMixer.fadergroup, \addToHead);
 
 		sendSynth.map(\level, levelControl.bus.index);
 		^levelSynth
@@ -148,7 +148,7 @@ MixerSend {
 
 		bundle.add(["/n_set", sendSynth.nodeID, \busout, bus.index]);
 		outbus = bus;
-		updateGUI.if({ inMixer.mcgui.refresh });
+		if(updateGUI and: { inMixer.mcgui.notNil }) { inMixer.mcgui.refresh };
 	}
 	
 	makeServerObjects { |bus|	// details are handled by subclass - objectsToBundle
@@ -304,7 +304,7 @@ MixerPostSend : MixerSend {
 			// outChannels here b/c this is postfader, using output channels
 		(inMixer.outChannels != out1.numChannels).if({
 			("Warning: numChannel mismatch creating send for " ++ inMixer.name
-				++ " -- " ++ inMixer.outChannels ++ " --> " ++ outbus.numChannels).postln;
+				++ " -- " ++ inMixer.outChannels ++ " --> " ++ out1.numChannels).postln;
 		});
 		
 		this.makeServerObjects(out1);
